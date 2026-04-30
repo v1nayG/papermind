@@ -8,3 +8,5 @@ An AI-powered research assistant that plans, searches, scrapes, summarizes, and 
 - 🚀 Parallel assembly-line processing with concurrency-limited LLM summarization
 - 📄 Export research reports to PDF and Markdown
 - 🔐 Secure JWT Auth with dual-token refresh bridge
+
+<!-- commit 1 on April 30 -->
