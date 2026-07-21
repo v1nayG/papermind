@@ -15,6 +15,11 @@ const PublicRoute = ({ children }) => {
   return isAuthenticated ? <Navigate to="/chat" replace /> : children;
 };
 
+// Redirect unauthenticated users away from protected pages
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 // Registers the silentRefresh function so api.js can call it automatically on 401
 const TokenRefreshBridge = () => {
   const { silentRefresh } = useAuth();
@@ -52,8 +57,8 @@ const AppRoutes = () => (
     <Routes>
       <Route path="/" element={<HeroPage />} />
       <Route element={<MainLayout />}>
-        <Route path="/chat" element={<ResearchPage />} />
-        <Route path="/chat/:sessionId" element={<ResearchPage />} />
+        <Route path="/chat" element={<ProtectedRoute><ResearchPage /></ProtectedRoute>} />
+        <Route path="/chat/:sessionId" element={<ProtectedRoute><ResearchPage /></ProtectedRoute>} />
         <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
       </Route>
