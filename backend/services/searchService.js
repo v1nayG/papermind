@@ -29,4 +29,36 @@ const searchWeb = async (query, limit = 3) => {
   }));
 };
 
-module.exports = { searchWeb };
+/**
+ * Image Search Service
+ * Calls the Serper Images API and returns the top image results.
+ *
+ * @param {string} query - The search query for images
+ * @param {number} limit - How many images to return (default 5)
+ * @returns {{ imageUrl: string, title: string }[]}
+ */
+const searchImages = async (query, limit = 5) => {
+  try {
+    const response = await axios.post(
+      'https://google.serper.dev/images',
+      { q: query, num: limit },
+      {
+        headers: {
+          'X-API-KEY': process.env.SERPER_API_KEY,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const results = response.data.images || [];
+    return results.slice(0, limit).map((r) => ({
+      imageUrl: r.imageUrl,
+      title: r.title,
+    }));
+  } catch (err) {
+    console.error('[ImageSearch] Failed:', err.message);
+    return [];
+  }
+};
+
+module.exports = { searchWeb, searchImages };

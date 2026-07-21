@@ -23,7 +23,13 @@ const ResearchPage = () => {
   }, [messages]);
 
   useEffect(() => {
-    if (!sessionId || !isAuthenticated || isResearching) return;
+    if (!isAuthenticated || isResearching) return;
+    
+    if (!sessionId) {
+      setMessages([]);
+      return;
+    }
+
     let cancelled = false;
 
     const loadSession = async () => {
@@ -145,35 +151,44 @@ const ResearchPage = () => {
   };
 
   return (
-    <div className="chat-layout">
+    <div className="flex flex-col h-full bg-hero-bg relative">
       {/* Messages Area */}
-      <div className="chat-history">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex flex-col scrollbar-thin">
         {messages.length === 0 && !isResearching ? (
-          <div className="chat-empty">
-            <div className="chat-empty-mark">✦</div>
-            <h1 className="chat-empty-title">What would you like to research?</h1>
-            <p className="chat-empty-subtitle">Ask PaperMind to search the web, read sources, and turn them into a cited report.</p>
+          <div className="m-auto text-center max-w-2xl text-foreground px-4 opacity-0 animate-fade-up" style={{ animationDelay: '0.2s' }}>
+            <h1 className="text-4xl sm:text-5xl font-semibold mb-4 tracking-tight font-space text-white">
+              Research Intelligence
+            </h1>
+            <p className="text-muted-foreground font-light text-base sm:text-lg leading-relaxed max-w-lg mx-auto">
+              Enter any topic to begin. PaperMind will autonomously search the web, analyze sources, and synthesize a comprehensive report.
+            </p>
           </div>
         ) : (
-          <div className="chat-messages-container">
+          <div className="flex flex-col gap-6 max-w-4xl w-full mx-auto pb-4">
             {messages.map((msg, idx) => (
-              <div key={idx} className={`chat-message-row ${msg.role === 'user' ? 'row-user' : 'row-ai'}`}>
+              <div key={idx} className="flex w-full animate-fade-in">
                 {msg.role === 'user' ? (
-                  <div className="chat-bubble-user">{msg.content}</div>
+                  <div className="ml-auto bg-[#0a84ff] text-white px-5 py-3.5 rounded-3xl rounded-tr-md max-w-[85%] sm:max-w-[75%] shadow-lg text-[15px] leading-relaxed">
+                    {msg.content}
+                  </div>
                 ) : (
-                  <div className="chat-bubble-ai">
+                  <div className="mr-auto w-full bg-background border border-border/50 rounded-2xl rounded-tl-md shadow-2xl overflow-hidden relative">
                     {msg.error ? (
-                      <div className="error-msg">{msg.error}</div>
+                      <div className="p-5 text-destructive bg-destructive/10 text-sm font-semibold tracking-wide border-b border-destructive/20 uppercase">
+                        {msg.error}
+                      </div>
                     ) : msg.report ? (
-                      <ReportView
-                        report={msg.report}
-                        sources={msg.sources}
-                        conflicts={msg.conflicts}
-                        sessionId={msg.sessionId}
-                        topic={messages[idx - 1]?.content}
-                      />
+                      <div className="p-0">
+                        <ReportView
+                          report={msg.report}
+                          sources={msg.sources}
+                          conflicts={msg.conflicts}
+                          sessionId={msg.sessionId}
+                          topic={messages[idx - 1]?.content}
+                        />
+                      </div>
                     ) : (
-                      <div className="chat-ai-progress">
+                      <div className="p-5 bg-white/5 border-b border-white/5">
                         <ProgressBar currentStage={msg.stage} message={msg.message} />
                       </div>
                     )}
@@ -187,13 +202,16 @@ const ResearchPage = () => {
       </div>
 
       {/* Input Area */}
-      <div className="chat-input-wrapper">
-        <form className="chat-input-box" onSubmit={handleSubmit}>
+      <div className="p-4 sm:p-6 bg-gradient-to-t from-hero-bg via-hero-bg to-transparent flex flex-col items-center flex-shrink-0 z-10">
+        <form 
+          className="w-full max-w-4xl bg-background/80 backdrop-blur-xl border border-border rounded-[2rem] flex items-end p-2 pl-6 shadow-2xl focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all"
+          onSubmit={handleSubmit}
+        >
           <textarea
             ref={textareaRef}
-            className="chat-textarea"
+            className="flex-1 bg-transparent border-none text-foreground resize-none text-[15px] leading-relaxed py-3.5 max-h-[200px] min-h-[24px] outline-none placeholder:text-muted-foreground/60 scrollbar-thin"
             rows={1}
-            placeholder="Message PaperMind"
+            placeholder="Message PaperMind..."
             value={topic}
             onChange={handleInput}
             disabled={isResearching}
@@ -205,21 +223,21 @@ const ResearchPage = () => {
             }}
           />
           <button
-            className="chat-submit-btn"
+            className="w-10 h-10 ml-2 mb-1 flex items-center justify-center rounded-full bg-foreground text-background hover:bg-primary transition-all disabled:opacity-30 disabled:hover:bg-foreground flex-shrink-0 cursor-pointer"
             type="submit"
             disabled={isResearching || !topic.trim()}
           >
             {isResearching ? (
-              <div className="spinner-small" />
+              <div className="w-5 h-5 border-2 border-background/20 border-t-background rounded-full animate-spin" />
             ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="19" x2="12" y2="5"></line>
+                <polyline points="5 12 12 5 19 12"></polyline>
               </svg>
             )}
           </button>
         </form>
-        <div className="chat-footer">
+        <div className="mt-3 text-[11px] text-muted-foreground/50 tracking-wide font-light text-center">
           PaperMind can make mistakes. Verify important information.
         </div>
       </div>

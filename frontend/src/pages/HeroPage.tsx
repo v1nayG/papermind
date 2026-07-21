@@ -1,182 +1,123 @@
-import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Globe, ArrowRight, Search, MessageSquare } from 'lucide-react';
-import AboutSection from '../components/landing/AboutSection';
-import FeaturedVideoSection from '../components/landing/FeaturedVideoSection';
-import PhilosophySection from '../components/landing/PhilosophySection';
-import FeaturesSection from '../components/landing/FeaturesSection';
-import './HeroPage.css'; // Contains body resets
+import React, { Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '../components/ui/button';
 
-export default function HeroPage() {
-  const videoRef = useRef(null);
+// Lazy load the Spline component to prevent blocking the initial render
+const Spline = React.lazy(() => import('@splinetool/react-spline'));
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    let fadeAnimation;
-
-    const animateOpacity = (start, end, duration) => {
-      const startTime = performance.now();
-      
-      const animate = (currentTime) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        // Easing function (easeOutQuad)
-        const easeProgress = 1 - (1 - progress) * (1 - progress);
-        
-        if (video) {
-          video.style.opacity = start + (end - start) * easeProgress;
-        }
-
-        if (progress < 1) {
-          fadeAnimation = requestAnimationFrame(animate);
-        }
-      };
-      
-      cancelAnimationFrame(fadeAnimation);
-      fadeAnimation = requestAnimationFrame(animate);
-    };
-
-    const handleCanPlay = () => {
-      video.play().catch(e => console.log("Autoplay prevented:", e));
-      animateOpacity(0, 1, 500);
-    };
-
-    const handleTimeUpdate = () => {
-      if (video.duration && video.currentTime) {
-        const remaining = video.duration - video.currentTime;
-        // Start fading out 550ms before the end
-        if (remaining <= 0.55 && video.style.opacity > 0.5) {
-          animateOpacity(1, 0, 500);
-        }
-      }
-    };
-
-    const handleEnded = () => {
-      video.style.opacity = '0';
-      setTimeout(() => {
-        video.currentTime = 0;
-        video.play().catch(e => console.log("Autoplay prevented:", e));
-        animateOpacity(0, 1, 500);
-      }, 100);
-    };
-
-    video.addEventListener('canplay', handleCanPlay);
-    video.addEventListener('timeupdate', handleTimeUpdate);
-    video.addEventListener('ended', handleEnded);
-
-    return () => {
-      video.removeEventListener('canplay', handleCanPlay);
-      video.removeEventListener('timeupdate', handleTimeUpdate);
-      video.removeEventListener('ended', handleEnded);
-      cancelAnimationFrame(fadeAnimation);
-    };
-  }, []);
+function Navbar() {
+  const navigate = useNavigate();
 
   return (
-    <div className="bg-black text-white font-['Inter']">
-      {/* SECTION 1: HERO */}
-      <section className="min-h-screen relative flex flex-col overflow-hidden">
-        {/* Background Video */}
-        <video
-          ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover object-bottom"
-          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_074625_a81f018a-956b-43fb-9aee-4d1508e30e6a.mp4"
-          muted
-          playsInline
-          preload="auto"
-          style={{ opacity: 0 }}
-        />
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 lg:px-16 py-5">
+      {/* Left: Logo text */}
+      <div className="text-foreground text-xl font-semibold tracking-tight">
+        PAPERMIND
+      </div>
 
-        {/* Navbar */}
-        <nav className="relative z-20 px-6 py-6 w-full max-w-5xl mx-auto">
-          <div className="liquid-glass rounded-full px-6 py-3 flex justify-between items-center">
-            <div className="flex items-center">
-              <Link to="/" className="flex items-center gap-2 text-white">
-                <Globe className="w-6 h-6" />
-                <span className="font-semibold text-lg tracking-tight">PaperMind</span>
-              </Link>
-              
-              <div className="hidden md:flex items-center gap-8 ml-8">
-                <a href="#about" className="text-white/80 hover:text-white text-sm font-medium transition-colors">Features</a>
-                <a href="#engine" className="text-white/80 hover:text-white text-sm font-medium transition-colors">Architecture</a>
-                <a href="#manifesto" className="text-white/80 hover:text-white text-sm font-medium transition-colors">Manifesto</a>
-              </div>
-            </div>
+      {/* Center: Nav links */}
+      <div className="hidden md:flex items-center gap-8">
+        {["Platform", "Agents", "Research", "Team", "Contacts"].map((link) => (
+          <a
+            key={link}
+            href={`#${link.toLowerCase()}`}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest"
+          >
+            {link}
+          </a>
+        ))}
+      </div>
 
-            <div className="flex items-center gap-6">
-              <Link to="/register" className="text-white text-sm font-medium hover:text-white/80 transition-colors">
-                Sign Up
-              </Link>
-              <Link to="/login" className="liquid-glass rounded-full px-6 py-2 text-white text-sm font-medium hover:bg-white/5 transition-colors">
-                Login
-              </Link>
-            </div>
-          </div>
-        </nav>
+      {/* Right: Get Quote Button */}
+      <Button
+        variant="navCta"
+        size="lg"
+        onClick={() => navigate('/auth')}
+        className="hidden md:inline-flex rounded-lg uppercase text-xs tracking-widest px-6"
+      >
+        LOGIN
+      </Button>
+    </nav>
+  );
+}
 
-        {/* Hero Content */}
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-12 text-center -translate-y-[10%] md:-translate-y-[20%]">
-          <h1 className="text-7xl md:text-8xl lg:text-9xl text-white tracking-tight whitespace-nowrap mb-12">
-            Research it then <em className="font-['Instrument_Serif'] italic">all</em>.
-          </h1>
+function HeroSection() {
+  const navigate = useNavigate();
 
-          <div className="max-w-xl w-full mx-auto mb-8">
-            <div className="liquid-glass rounded-full pl-6 pr-2 py-2 flex items-center gap-3">
-              <input 
-                type="email" 
-                placeholder="Enter your email" 
-                className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-white/40 text-base"
-              />
-              <button className="bg-white rounded-full p-3 text-black hover:scale-105 transition-transform">
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
+  return (
+    <section className="relative min-h-screen flex items-end bg-hero-bg overflow-hidden">
+      {/* Spline 3D Background */}
+      <div className="absolute inset-0">
+        <Suspense fallback={<div className="absolute inset-0 bg-hero-bg" />}>
+          <Spline
+            scene="https://prod.spline.design/Slk6b8kz3LRlKiyk/scene.splinecode"
+            className="w-full h-full"
+          />
+        </Suspense>
+      </div>
 
-          <p className="text-white text-sm md:text-base leading-relaxed px-4 max-w-md mx-auto mb-10">
-            Skip the endless tabs and manual synthesis. Join the waitlist for the most advanced multi-agent research pipeline ever built.
-          </p>
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/30 z-[1] pointer-events-none" />
 
-          <Link to="/login" className="liquid-glass rounded-full px-8 py-3 text-white text-sm font-medium hover:bg-white/5 transition-colors">
-            Try PaperMind Engine
-          </Link>
+      {/* Content container */}
+      <div className="relative z-10 pointer-events-none w-full max-w-[90%] sm:max-w-md lg:max-w-2xl px-6 md:px-10 pb-10 md:pb-10 pt-32">
+        
+        <h1 
+          className="text-[clamp(3rem,8vw,6rem)] font-bold leading-[1.05] tracking-[-0.05em] text-foreground mb-2 md:mb-4 uppercase opacity-0 animate-fade-up"
+          style={{ animationDelay: '0.2s' }}
+        >
+          PAPERMIND
+          <span className="text-primary"> AI</span>
+        </h1>
+
+        <p 
+          className="text-foreground/80 text-[clamp(1.125rem,2.5vw,1.875rem)] font-light mb-3 md:mb-6 opacity-0 animate-fade-up"
+          style={{ animationDelay: '0.4s' }}
+        >
+          We implement autonomous research correctly.
+        </p>
+
+        <p 
+          className="text-muted-foreground text-[clamp(0.875rem,1.5vw,1.25rem)] font-light mb-4 md:mb-8 opacity-0 animate-fade-up"
+          style={{ animationDelay: '0.55s' }}
+        >
+          Enterprise research agents built in days. AI-powered web synthesis deployed with zero-hallucination architecture. Smart data pipelines set up for your entire organization. All of it done right, not just fast.
+        </p>
+
+        <div 
+          className="flex flex-wrap gap-3 font-bold opacity-0 animate-fade-up"
+          style={{ animationDelay: '0.7s' }}
+        >
+          <button 
+            onClick={() => navigate('/auth')}
+            className="pointer-events-auto bg-primary text-primary-foreground px-6 py-3 md:px-8 md:py-4 text-sm rounded-sm cursor-pointer hover:brightness-110 transition-all active:scale-[0.97]"
+          >
+            Start Research
+          </button>
+          <button 
+            className="pointer-events-auto bg-white text-background px-6 py-3 md:px-8 md:py-4 text-sm rounded-sm cursor-pointer hover:brightness-90 transition-all active:scale-[0.97]"
+          >
+            Our Work
+          </button>
         </div>
 
-        {/* Social Icons Footer */}
-        <div className="relative z-10 flex justify-center gap-4 pb-12 mt-auto">
-          <button className="liquid-glass rounded-full p-4 text-white/80 hover:text-white hover:bg-white/5 transition-all">
-            <Search className="w-5 h-5" />
-          </button>
-          <button className="liquid-glass rounded-full p-4 text-white/80 hover:text-white hover:bg-white/5 transition-all">
-            <MessageSquare className="w-5 h-5" />
-          </button>
-          <button className="liquid-glass rounded-full p-4 text-white/80 hover:text-white hover:bg-white/5 transition-all">
-            <Globe className="w-5 h-5" />
-          </button>
-        </div>
-      </section>
+        <p 
+          className="text-muted-foreground/60 text-xs font-light mt-4 md:mt-6 opacity-0 animate-fade-up"
+          style={{ animationDelay: '0.85s' }}
+        >
+          Trusted AI partner. San Francisco, CA. 10M+ reports generated.
+        </p>
 
-      {/* SECTION 2: ABOUT */}
-      <div id="about">
-        <AboutSection />
       </div>
+    </section>
+  );
+}
 
-      {/* SECTION 3: FEATURED VIDEO */}
-      <div id="engine">
-        <FeaturedVideoSection />
-      </div>
-
-      {/* SECTION 4: PHILOSOPHY */}
-      <div id="manifesto">
-        <PhilosophySection />
-      </div>
-
-      {/* SECTION 5: FEATURES (SERVICES) */}
-      <FeaturesSection />
-
+export default function HeroPage() {
+  return (
+    <div className="bg-hero-bg min-h-screen">
+      <Navbar />
+      <HeroSection />
     </div>
   );
 }

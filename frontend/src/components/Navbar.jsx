@@ -1,23 +1,19 @@
-import { Link } from 'react-router-dom';
+import { PanelLeftOpen } from 'lucide-react';
 
 const Navbar = ({ sidebarOpen, onToggleSidebar }) => {
   return (
-    <nav className="chat-navbar">
-      {/* Show hamburger in navbar ONLY when sidebar is closed */}
-      {!sidebarOpen && (
-        <button className="sidebar-toggle-btn" onClick={onToggleSidebar} aria-label="Open sidebar">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        </button>
-      )}
-      <div className="chat-navbar-title">
-        <Link to="/" className="navbar-logo-text">⚡ PaperMind</Link>
+    <nav className="h-14 bg-background/50 backdrop-blur-xl border-b border-border flex items-center justify-between px-4 sm:px-6 flex-shrink-0 relative z-40">
+      <div className="flex items-center">
+        {!sidebarOpen && (
+          <button 
+            className="p-2 -ml-2 rounded-md hover:bg-white/5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer mr-4" 
+            onClick={onToggleSidebar} 
+            aria-label="Open sidebar"
+          >
+            <PanelLeftOpen className="w-5 h-5" />
+          </button>
+        )}
       </div>
-      {/* Balance spacer so logo stays centered when hamburger is visible */}
-      {!sidebarOpen && <div style={{ width: 34 }} />}
     </nav>
   );
 };

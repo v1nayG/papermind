@@ -2,7 +2,7 @@ const Session = require('../models/Session');
 const { plannerAgent } = require('../agents/plannerAgent');
 const { summarizerAgent } = require('../agents/summarizerAgent');
 const { synthesizerAgent } = require('../agents/synthesizerAgent');
-const { searchWeb } = require('../services/searchService');
+const { searchWeb, searchImages } = require('../services/searchService');
 const { scrapeUrl } = require('../services/scraperService');
 
 /**
@@ -63,48 +63,53 @@ const startResearch = async (req, res) => {
       check();
     });
 
-    let totalSources = 0;
+    // 1. Run text search and image search concurrently for maximum speed
+    const [searchResultsLists, images] = await Promise.all([
+      Promise.all(queries.map(q => searchWeb(q, 3))),
+      searchImages(topic, 5),
+    ]);
+    const searchResults = searchResultsLists.flat();
+    console.log(`[Research] Found ${images.length} images for topic "${topic}"`);
+    sendEvent(res, 'progress', { stage: 'searching', message: `Found ${images.length} relevant images...` });
+
+    // 2. Deduplicate search results by URL early
+    const uniqueResults = [];
+    const seenUrls = new Set();
+    for (const r of searchResults) {
+      if (!seenUrls.has(r.url)) {
+        seenUrls.add(r.url);
+        uniqueResults.push(r);
+      }
+    }
+
+    const totalSources = uniqueResults.length;
     let doneCount = 0;
 
-    // Run all query pipelines in parallel
-    const allSummarizedSources = (await Promise.all(
-      queries.map(async (query) => {
-        // 1. Search
-        const results = await searchWeb(query, 3);
+    sendEvent(res, 'progress', { stage: 'scraping', message: `Extracting content from ${totalSources} sources...` });
 
-        // 2. Scrape all results for this query in parallel
-        const scraped = await Promise.all(results.map(r => scrapeUrl(r)));
+    // 3. Scrape all unique URLs
+    const scraped = await Promise.all(uniqueResults.map(r => scrapeUrl(r)));
 
-        // 3. Summarize each scraped source — throttled to 3 concurrent LLM calls
-        const summarized = await Promise.all(
-          scraped.map(async (source) => {
-            await waitForSlot();
-            try {
-              const result = await summarizerAgent(source);
-              doneCount++;
-              sendEvent(res, 'progress', {
-                stage: 'summarizing',
-                message: `Summarized ${doneCount} of ${totalSources} sources...`
-              });
-              return result;
-            } finally {
-              activeLLM--;
-            }
-          })
-        );
-
-        return summarized;
+    // 4. Summarize each scraped source — throttled to 3 concurrent LLM calls
+    const allSummarizedSources = await Promise.all(
+      scraped.map(async (source) => {
+        await waitForSlot();
+        try {
+          const result = await summarizerAgent(source);
+          doneCount++;
+          sendEvent(res, 'progress', {
+            stage: 'summarizing',
+            message: `Summarized ${doneCount} of ${totalSources} sources...`
+          });
+          return result;
+        } finally {
+          activeLLM--;
+        }
       })
-    )).flat();
+    );
 
-    // Deduplicate by URL
-    const seenUrls = new Set();
-    const summarizedSources = allSummarizedSources.filter(s => {
-      if (!s?.url || seenUrls.has(s.url)) return false;
-      seenUrls.add(s.url);
-      totalSources++;
-      return true;
-    });
+    // Filter out failed summarizations
+    const summarizedSources = allSummarizedSources.filter(s => !!s);
 
     session.sources = summarizedSources;
     await session.save();
@@ -115,7 +120,7 @@ const startResearch = async (req, res) => {
     session.status = 'synthesizing';
     await session.save();
 
-    const { report, conflicts } = await synthesizerAgent(topic, summarizedSources, mode);
+    const { report, conflicts } = await synthesizerAgent(topic, summarizedSources, mode, images);
 
     // Save completed session
     session.report = report;
