@@ -55,14 +55,18 @@ const ReportView = ({ report, sources = [], conflicts = [], sessionId, topic }) 
 
       {/* Conflicts */}
       {conflicts && conflicts.length > 0 && (
-        <div className="m-6 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
-          <div className="flex items-center gap-2 text-destructive font-bold mb-2 uppercase text-xs tracking-widest">
+        <div className="m-6 p-5 rounded-xl bg-amber-500/5 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)] backdrop-blur-sm relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+          <div className="flex items-center gap-2 text-amber-500 font-bold mb-3 uppercase text-xs tracking-widest font-space">
             <AlertTriangle className="w-4 h-4" />
-            Conflicts Detected
+            Data Conflicts Detected
           </div>
-          <ul className="list-disc list-inside space-y-1 text-sm text-destructive/90">
+          <ul className="space-y-2">
             {conflicts.map((c, i) => (
-              <li key={i}>{c}</li>
+              <li key={i} className="flex gap-2 text-sm text-amber-500/80 leading-relaxed font-light">
+                <span className="text-amber-500 mt-1">•</span>
+                {c}
+              </li>
             ))}
           </ul>
         </div>

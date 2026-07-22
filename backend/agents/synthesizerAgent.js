@@ -41,7 +41,7 @@ CRITICAL REQUIREMENTS:
 3. IMAGES: You have been given a list of images (IMG1, IMG2, etc.). Embed them naturally throughout the report at logical, relevant points using this exact Markdown syntax: ![Alt Text](imageUrl). Place images where they enhance understanding — after introducing a concept, alongside a key finding, etc. Use at least 2-3 images if available.
 4. STRUCTURE: ${formatInstruction}
 5. DEPTH: Do not just list facts. Analyze, compare, contrast, and explain the significance of information. Add context.
-6. CONFLICTS: At the end, add a "## Conflicts Detected" section listing any contradictions between sources. If none, write "No significant conflicts detected."
+6. CONFLICTS: At the end, add a "## Conflicts Detected" section. List any contradictions between sources as a simple bulleted list of plain text sentences. DO NOT use markdown tables or pipes (|) in this section. If none, write "No significant conflicts detected."
 
 Available Images (embed these using Markdown ![]() syntax):
 ${imagesText}
@@ -65,7 +65,7 @@ Be thorough, analytical, and insightful. A reader should feel they have read a p
   // Parse conflict lines (skip "No significant conflicts" line)
   const conflicts = conflictsRaw
     .split('\n')
-    .map((line) => line.trim())
+    .map((line) => line.trim().replace(/^[-*•]\s*/, ''))
     .filter((line) => line.length > 0 && !line.toLowerCase().includes('no significant'));
 
   return { report, conflicts };
