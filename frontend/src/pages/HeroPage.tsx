@@ -15,17 +15,8 @@ function Navbar() {
         PAPERMIND
       </div>
 
-      {/* Center: Nav links */}
+      {/* Center: Nav removed to clean up dead links */}
       <div className="hidden md:flex items-center gap-8">
-        {["Platform", "Agents", "Research", "Team", "Contacts"].map((link) => (
-          <a
-            key={link}
-            href={`#${link.toLowerCase()}`}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase tracking-widest"
-          >
-            {link}
-          </a>
-        ))}
       </div>
 
       {/* Right: Get Quote Button */}
@@ -78,10 +69,10 @@ function HeroSection() {
         </p>
 
         <p 
-          className="text-muted-foreground text-[clamp(0.875rem,1.5vw,1.25rem)] font-light mb-4 md:mb-8 opacity-0 animate-fade-up"
+          className="text-muted-foreground text-[clamp(0.875rem,1.5vw,1.25rem)] font-light mb-4 md:mb-8 opacity-0 animate-fade-up max-w-[90%]"
           style={{ animationDelay: '0.55s' }}
         >
-          Enterprise research agents built in days. AI-powered web synthesis deployed with zero-hallucination architecture. Smart data pipelines set up for your entire organization. All of it done right, not just fast.
+          An intelligent research assistant that autonomously searches, reads, and synthesizes the web. Built with a concurrent multi-agent architecture to generate deeply cited, comprehensive reports in seconds.
         </p>
 
         <div 
@@ -94,19 +85,7 @@ function HeroSection() {
           >
             Start Research
           </button>
-          <button 
-            className="pointer-events-auto bg-white text-background px-6 py-3 md:px-8 md:py-4 text-sm rounded-sm cursor-pointer hover:brightness-90 transition-all active:scale-[0.97]"
-          >
-            Our Work
-          </button>
         </div>
-
-        <p 
-          className="text-muted-foreground/60 text-xs font-light mt-4 md:mt-6 opacity-0 animate-fade-up"
-          style={{ animationDelay: '0.85s' }}
-        >
-          Trusted AI partner. San Francisco, CA. 10M+ reports generated.
-        </p>
 
       </div>
     </section>
