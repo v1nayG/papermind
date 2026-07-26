@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { api } from '../services/api';
-import { Download, FileText, AlertTriangle, Link2 } from 'lucide-react';
+import { FileText, AlertTriangle, Link2 } from 'lucide-react';
 
 const ReportView = ({ report, sources = [], conflicts = [], sessionId, topic }) => {
   const handleDownload = async (url) => {
@@ -40,14 +40,7 @@ const ReportView = ({ report, sources = [], conflicts = [], sessionId, topic }) 
               onClick={() => handleDownload(api.getMarkdownUrl(sessionId))}
             >
               <FileText className="w-3.5 h-3.5" />
-              MD
-            </button>
-            <button
-              className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider bg-primary/20 hover:bg-primary/40 text-primary rounded transition-colors cursor-pointer"
-              onClick={() => handleDownload(api.getPdfUrl(sessionId))}
-            >
-              <Download className="w-3.5 h-3.5" />
-              PDF
+              Export MD
             </button>
           </div>
         )}
