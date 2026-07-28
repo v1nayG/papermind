@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // We keep a reference to the silentRefresh function from AuthContext
 // It's set once on app load via setRefreshHandler()
@@ -64,5 +64,4 @@ export const api = {
 
   // Export URLs — opened as downloads, token passed via fetch in ReportView
   getMarkdownUrl: (sessionId) => `${API_BASE}/export/markdown/${sessionId}`,
-  getPdfUrl: (sessionId) => `${API_BASE}/export/pdf/${sessionId}`,
 };
