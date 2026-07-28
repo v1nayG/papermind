@@ -82,7 +82,8 @@ const ResearchPage = () => {
     setIsResearching(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/research/start', {
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const response = await fetch(`${API_BASE}/research/start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
