@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 type FadeUpProps = {
   children: ReactNode;
