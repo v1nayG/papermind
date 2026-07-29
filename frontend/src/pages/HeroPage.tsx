@@ -58,7 +58,7 @@ function HeroSection() {
           className="text-foreground/80 text-[clamp(1.125rem,2.5vw,1.875rem)] font-light mb-3 md:mb-6 opacity-0 animate-fade-up"
           style={{ animationDelay: '0.4s' }}
         >
-          We implement autonomous research correctly.
+          Autonomous Multi-Agent AI Research Platform
         </p>
 
         <p

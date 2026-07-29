@@ -1,6 +1,6 @@
 # PaperMind
 
-> An autonomous AI research agent that plans, searches, scrapes, summarizes, and synthesizes comprehensive research reports — complete with inline citations, conflict detection, and embedded images.
+> Autonomous Multi-Agent AI Research Platform
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=node.js)](https://nodejs.org/)
