@@ -9,6 +9,9 @@ connectDB();
 
 const app = express();
 
+// Trust Render's reverse proxy so rate-limiter works correctly in production
+app.set('trust proxy', 1);
+
 // ── Middleware ──────────────────────────────────────────────
 // Parse incoming JSON request bodies
 app.use(express.json());
