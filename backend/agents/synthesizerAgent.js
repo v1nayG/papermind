@@ -54,7 +54,7 @@ Be thorough, analytical, and insightful. A reader should feel they have read a p
   const fullResponse = await callLLM(
     systemPrompt,
     userMessage,
-    'mistralai/mistral-7b-instruct:free'
+    'openrouter/auto'
   );
 
   // Split report body from conflicts section

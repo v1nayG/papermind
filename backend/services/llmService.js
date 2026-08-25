@@ -12,7 +12,7 @@ const axios = require('axios');
 const callLLM = async (
   systemPrompt,
   userMessage,
-  model = 'mistralai/mistral-7b-instruct:free'
+  model = 'openrouter/auto'
 ) => {
   const response = await axios.post(
     'https://openrouter.ai/api/v1/chat/completions',
