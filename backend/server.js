@@ -16,11 +16,16 @@ app.set('trust proxy', 1);
 // Parse incoming JSON request bodies
 app.use(express.json());
 
-// Allow requests from our React frontend (accepting all origins for easy local dev)
+// Allow requests from our React frontend
 app.use(cors({
   origin: true,
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+// Handle preflight OPTIONS requests for all routes
+app.options('*', cors());
 
 // Rate limiting — max 100 requests per 15 minutes per IP
 const limiter = rateLimit({

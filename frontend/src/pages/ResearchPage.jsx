@@ -34,7 +34,8 @@ const ResearchPage = () => {
 
     const loadSession = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/research/session/${sessionId}`, {
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        const response = await fetch(`${API_BASE}/research/session/${sessionId}`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         const data = await response.json();
