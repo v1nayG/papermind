@@ -54,7 +54,7 @@ Be thorough, analytical, and insightful. A reader should feel they have read a p
   const fullResponse = await callLLM(
     systemPrompt,
     userMessage,
-    'google/gemini-2.0-flash-lite-preview-02-05:free'
+    'mistralai/mistral-7b-instruct:free'
   );
 
   // Split report body from conflicts section
