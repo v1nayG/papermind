@@ -32,7 +32,7 @@ export default function AuthPage() {
     try {
       const data = isLoginMode 
         ? await api.login(email, password)
-        : await api.register(name, email, password);
+        : await api.register(email, password);
         
       if (data.error) { 
         setError(data.error); 
@@ -42,7 +42,7 @@ export default function AuthPage() {
       login(data.user, { accessToken: data.accessToken, refreshToken: data.refreshToken });
       navigate('/');
     } catch {
-      setError(`${isLoginMode ? 'Login' : 'Registration'} failed. Please try again.`);
+      setError(`${isLoginMode ? 'Login' : 'Registration'} failed. The server may be waking up — please try again in 30 seconds.`);
     } finally {
       setLoading(false);
     }
