@@ -9,43 +9,45 @@ connectDB();
 
 const app = express();
 
-// Trust Render's reverse proxy so rate-limiter works correctly in production
+// Trust Render's reverse proxy (required for rate limiter + IP detection)
 app.set('trust proxy', 1);
 
-// ── Middleware ──────────────────────────────────────────────
-// Parse incoming JSON request bodies
-app.use(express.json());
-
-// Allow requests from our React frontend
-app.use(cors({
+// ── CORS — must be FIRST before everything else ──────────────
+const corsOptions = {
   origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+};
+app.use(cors(corsOptions));
 
-// Handle preflight OPTIONS requests for all routes
-app.options('*', cors());
+// Handle ALL preflight OPTIONS requests immediately — before rate limiter
+app.options('*', cors(corsOptions));
 
-// Rate limiting — max 100 requests per 15 minutes per IP
+// ── Body Parser ──────────────────────────────────────────────
+app.use(express.json());
+
+// ── Rate Limiting ────────────────────────────────────────────
+// Disable X-Forwarded-For validation warning since we handle it via trust proxy
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
-  message: { error: 'Too many requests, please try again later.' }
+  message: { error: 'Too many requests, please try again later.' },
+  validate: { xForwardedForHeader: false },
 });
 app.use('/api', limiter);
 
-// ── Routes ─────────────────────────────────────────────────
+// ── Routes ───────────────────────────────────────────────────
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/research', require('./routes/researchRoutes'));
 app.use('/api/export', require('./routes/exportRoutes'));
 
-// ── Health Check ────────────────────────────────────────────
+// ── Health Check ─────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.json({ message: 'PaperMind API is running 🚀' });
 });
 
-// ── Start Server ────────────────────────────────────────────
+// ── Start Server ─────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
