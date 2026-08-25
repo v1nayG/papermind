@@ -24,12 +24,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
   const logout = async () => {
     try {
-      // Tell backend to clear the refresh token from DB
       const storedRefreshToken = localStorage.getItem('refreshToken');
       if (storedRefreshToken) {
-        await fetch('http://localhost:5000/api/auth/logout', {
+        await fetch(`${API_BASE}/auth/logout`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refreshToken: storedRefreshToken }),
@@ -54,7 +55,7 @@ export const AuthProvider = ({ children }) => {
     if (!storedRefreshToken) return null;
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/refresh', {
+      const res = await fetch(`${API_BASE}/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken: storedRefreshToken }),
